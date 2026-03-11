@@ -6,9 +6,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Link, useLocation } from "@tanstack/react-router";
-import { Check, Copy, LogIn, LogOut } from "lucide-react";
+import { Check, Copy, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import { ADMIN_PRINCIPAL } from "../constants";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
+import { getUserId } from "../utils/userId";
 
 export function Nav() {
   const location = useLocation();
@@ -19,6 +21,7 @@ export function Nav() {
   const principal = isAuthenticated
     ? identity.getPrincipal().toText()
     : undefined;
+  const isAdmin = principal === ADMIN_PRINCIPAL;
   const truncatedPrincipal = principal
     ? `${principal.slice(0, 5)}...${principal.slice(-3)}`
     : undefined;
@@ -33,10 +36,17 @@ export function Nav() {
     }
   };
 
+  const profileHref =
+    isAuthenticated && principal
+      ? `/profile/${getUserId(principal)}`
+      : "/profile";
+
+  const isProfileActive = location.pathname.startsWith("/profile");
+
   const navLinks = [
     { to: "/", label: "Home", ocid: "nav.home.link" },
-    { to: "/profile", label: "Profile", ocid: "nav.profile.link" },
     { to: "/posts", label: "Posts", ocid: "nav.posts.link" },
+    { to: "/rules", label: "Rules", ocid: "nav.rules.link" },
     { to: "/contact", label: "Contact", ocid: "nav.contact.link" },
   ];
 
@@ -61,6 +71,32 @@ export function Nav() {
               </Link>
             );
           })}
+          {/* Profile link — dynamic href based on auth state */}
+          <a
+            href={profileHref}
+            data-ocid="nav.profile.link"
+            className={`text-sm font-medium transition-colors ${
+              isProfileActive
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Profile
+          </a>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              data-ocid="nav.admin.link"
+              className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                location.pathname === "/admin"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Admin
+            </Link>
+          )}
         </nav>
         <div className="flex items-center gap-3">
           {isAuthenticated && truncatedPrincipal && principal && (

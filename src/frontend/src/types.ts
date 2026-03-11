@@ -21,10 +21,28 @@ export interface ProfileData {
   coverImage: string;
   thumbnails: string[];
   bio: string;
+  displayName?: string;
 }
 
 export interface Follower {
   principal: string;
   displayName: string;
   followedAt: number;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  sentAt: number;
+  read: boolean;
+}
+
+export interface Rule {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: number;
+  imageDataUrl?: string;
 }

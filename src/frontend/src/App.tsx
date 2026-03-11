@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import {
   Outlet,
@@ -5,13 +6,62 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  useNavigate,
 } from "@tanstack/react-router";
+import { LogIn } from "lucide-react";
+import { useEffect } from "react";
 import { Nav } from "./components/Nav";
+import { useInternetIdentity } from "./hooks/useInternetIdentity";
 import { AdminPage } from "./pages/AdminPage";
 import { ContactPage } from "./pages/ContactPage";
 import { HomePage } from "./pages/HomePage";
 import { PostsPage } from "./pages/PostsPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { RulesPage } from "./pages/RulesPage";
+import { getUserId } from "./utils/userId";
+
+function ProfileRedirect() {
+  const { identity, isInitializing, login, isLoggingIn } =
+    useInternetIdentity();
+  const navigate = useNavigate();
+  const isAuthenticated =
+    identity !== undefined && !identity.getPrincipal().isAnonymous();
+  const principal = isAuthenticated
+    ? identity.getPrincipal().toText()
+    : undefined;
+
+  useEffect(() => {
+    if (!isInitializing && isAuthenticated && principal) {
+      navigate({
+        to: "/profile/$userId",
+        params: { userId: getUserId(principal) },
+      });
+    }
+  }, [isInitializing, isAuthenticated, principal, navigate]);
+
+  if (isInitializing) return null;
+
+  if (!isAuthenticated) {
+    return (
+      <main className="max-w-3xl mx-auto px-6 py-24 text-center">
+        <p className="text-muted-foreground mb-4">
+          Sign in to view your profile.
+        </p>
+        <Button
+          onClick={login}
+          disabled={isLoggingIn}
+          className="gap-1.5"
+          data-ocid="profile.primary_button"
+        >
+          <LogIn className="w-3.5 h-3.5" />
+          {isLoggingIn ? "Signing in..." : "Sign in"}
+        </Button>
+      </main>
+    );
+  }
+
+  return null;
+}
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -46,9 +96,15 @@ const homeRoute = createRoute({
   component: HomePage,
 });
 
-const profileRoute = createRoute({
+const profileRedirectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile",
+  component: ProfileRedirect,
+});
+
+const profileUserRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/$userId",
   component: ProfilePage,
 });
 
@@ -64,6 +120,12 @@ const contactRoute = createRoute({
   component: ContactPage,
 });
 
+const rulesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/rules",
+  component: RulesPage,
+});
+
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin",
@@ -72,10 +134,12 @@ const adminRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
-  profileRoute,
+  profileRedirectRoute,
+  profileUserRoute,
   postsRoute,
   contactRoute,
   adminRoute,
+  rulesRoute,
 ]);
 
 const router = createRouter({ routeTree });

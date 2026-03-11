@@ -1,12 +1,24 @@
-import type { AdminPost, Follower, GlobalPost, ProfileData } from "../types";
+import type {
+  AdminPost,
+  ContactMessage,
+  Follower,
+  GlobalPost,
+  ProfileData,
+  Rule,
+} from "../types";
 
 const ADMIN_POSTS_KEY = "keomii_admin_posts";
 const GLOBAL_POSTS_KEY = "keomii_global_posts";
-const PROFILE_KEY = "keomii_profile";
 const FOLLOWERS_KEY = "keomii_followers";
 const BANNED_KEY = "keomii_banned";
 const PINNED_KEY = "keomii_pinned";
 const FEATURED_KEY = "keomii_featured";
+const CONTACT_MESSAGES_KEY = "keomii_contact_messages";
+const RULES_KEY = "keomii_rules";
+
+function profileKey(userId: string) {
+  return `keomii_profile_${userId}`;
+}
 
 export function getAdminPosts(): AdminPost[] {
   try {
@@ -34,19 +46,33 @@ export function saveGlobalPosts(posts: GlobalPost[]): void {
   localStorage.setItem(GLOBAL_POSTS_KEY, JSON.stringify(posts));
 }
 
-export function getProfileData(): ProfileData {
+export function getProfileData(userId?: string): ProfileData {
+  const key = userId ? profileKey(userId) : "keomii_profile";
   try {
-    const raw = localStorage.getItem(PROFILE_KEY);
+    const raw = localStorage.getItem(key);
     return raw
       ? JSON.parse(raw)
-      : { profileImage: "", coverImage: "", thumbnails: [], bio: "" };
+      : {
+          profileImage: "",
+          coverImage: "",
+          thumbnails: [],
+          bio: "",
+          displayName: "",
+        };
   } catch {
-    return { profileImage: "", coverImage: "", thumbnails: [], bio: "" };
+    return {
+      profileImage: "",
+      coverImage: "",
+      thumbnails: [],
+      bio: "",
+      displayName: "",
+    };
   }
 }
 
-export function saveProfileData(data: ProfileData): void {
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+export function saveProfileData(data: ProfileData, userId?: string): void {
+  const key = userId ? profileKey(userId) : "keomii_profile";
+  localStorage.setItem(key, JSON.stringify(data));
 }
 
 export function getFollowers(): Follower[] {
@@ -113,6 +139,45 @@ export function setIsFollowing(principal: string, following: boolean): void {
   }
 }
 
+export function getContactMessages(): ContactMessage[] {
+  try {
+    const raw = localStorage.getItem(CONTACT_MESSAGES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveContactMessages(messages: ContactMessage[]): void {
+  localStorage.setItem(CONTACT_MESSAGES_KEY, JSON.stringify(messages));
+}
+
+export function addContactMessage(
+  msg: Omit<ContactMessage, "id" | "sentAt" | "read">,
+): void {
+  const messages = getContactMessages();
+  const newMsg: ContactMessage = {
+    ...msg,
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    sentAt: Date.now(),
+    read: false,
+  };
+  saveContactMessages([newMsg, ...messages]);
+}
+
+export function getRules(): Rule[] {
+  try {
+    const raw = localStorage.getItem(RULES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveRules(rules: Rule[]): void {
+  localStorage.setItem(RULES_KEY, JSON.stringify(rules));
+}
+
 function getDefaultAdminPosts(): AdminPost[] {
   const defaults: AdminPost[] = [
     {
@@ -148,7 +213,7 @@ function getDefaultGlobalPosts(): GlobalPost[] {
       authorPrincipal: "demo-user-1",
       authorName: "Soleil",
       postType: "image",
-      caption: "Morning light and music 🌅",
+      caption: "Morning light and music",
       imageDataUrl: undefined,
       createdAt: Date.now() - 86400000 * 1,
     },

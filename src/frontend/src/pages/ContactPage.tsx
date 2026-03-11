@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { addContactMessage } from "../utils/storage";
 
 export function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -14,6 +15,11 @@ export function ContactPage() {
     e.preventDefault();
     setSubmitting(true);
     setTimeout(() => {
+      addContactMessage({
+        name: form.name,
+        email: form.email,
+        message: form.message,
+      });
       toast.success("Message sent! I'll get back to you soon.");
       setForm({ name: "", email: "", message: "" });
       setSubmitting(false);

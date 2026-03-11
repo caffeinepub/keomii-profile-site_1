@@ -60,7 +60,7 @@ export function HomePage() {
     saveFollowers(updated);
     setIsFollowing(principal, true);
     setFollowingState(true);
-    toast.success("Following Keomii!");
+    toast.success("Following Keoji!");
   };
 
   const handleUnfollow = () => {
@@ -84,7 +84,7 @@ export function HomePage() {
         </p>
 
         <h1 className="font-display text-7xl sm:text-8xl font-light leading-none tracking-tight text-foreground mb-8">
-          Keomii
+          Keoji
         </h1>
 
         <div className="w-12 h-px bg-primary/50 mb-10" />
@@ -141,7 +141,7 @@ export function HomePage() {
               ) : (
                 <>
                   <UserPlus className="w-3.5 h-3.5" />
-                  Follow Keomii
+                  Follow Keoji
                 </>
               )}
             </Button>

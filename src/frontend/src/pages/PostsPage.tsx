@@ -212,14 +212,14 @@ export function PostsPage() {
         </h1>
         <div className="w-10 h-px bg-primary/50 mb-10" />
 
-        <Tabs defaultValue="keomii">
+        <Tabs defaultValue="keoji">
           <TabsList className="mb-8 bg-secondary">
             <TabsTrigger
-              value="keomii"
-              data-ocid="posts.keomii_tab.tab"
+              value="keoji"
+              data-ocid="posts.keoji_tab.tab"
               className="font-body"
             >
-              Keomii&apos;s Posts
+              Keoji&apos;s Posts
             </TabsTrigger>
             <TabsTrigger
               value="global"
@@ -230,8 +230,8 @@ export function PostsPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Keomii's Posts */}
-          <TabsContent value="keomii">
+          {/* Keoji's Posts */}
+          <TabsContent value="keoji">
             {sortedAdminPosts.length === 0 ? (
               <p
                 className="text-muted-foreground text-sm"
