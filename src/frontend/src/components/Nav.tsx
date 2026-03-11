@@ -8,9 +8,8 @@ import {
 import { Link, useLocation } from "@tanstack/react-router";
 import { Check, Copy, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { useState } from "react";
-import { ADMIN_PRINCIPAL } from "../constants";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
-import { getUserId } from "../utils/userId";
+import { getUserId, isAdminPrincipal } from "../utils/userId";
 
 export function Nav() {
   const location = useLocation();
@@ -21,7 +20,7 @@ export function Nav() {
   const principal = isAuthenticated
     ? identity.getPrincipal().toText()
     : undefined;
-  const isAdmin = principal === ADMIN_PRINCIPAL;
+  const isAdmin = principal ? isAdminPrincipal(principal) : false;
   const truncatedPrincipal = principal
     ? `${principal.slice(0, 5)}...${principal.slice(-3)}`
     : undefined;

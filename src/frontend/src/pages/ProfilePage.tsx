@@ -15,7 +15,7 @@ import { Pencil, User, UserCheck, UserPlus, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { ADMIN_PRINCIPAL } from "../constants";
+
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import type { ProfileData } from "../types";
 import {
@@ -26,7 +26,7 @@ import {
   saveProfileData,
   setIsFollowing,
 } from "../utils/storage";
-import { getUserId } from "../utils/userId";
+import { getUserId, isAdminPrincipal } from "../utils/userId";
 
 function readFileAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -134,7 +134,7 @@ export function ProfilePage() {
   const principal = isAuthenticated
     ? identity.getPrincipal().toText()
     : undefined;
-  const isAdmin = principal === ADMIN_PRINCIPAL;
+  const isAdmin = principal ? isAdminPrincipal(principal) : false;
   const myUserId = principal ? getUserId(principal) : undefined;
   const isOwnProfile = !!myUserId && myUserId === userId;
 
